@@ -35,4 +35,94 @@ _start:
   subl $ST_SIZE_RESERVE, %esp
 
 open_files:
-  open_fd_in:
+open_fd_in:
+  movl $SYS_OPEN, %eax
+  movl ST_ARGV_1(%ebp), %ebx
+  movl $O_RDONLY, %ecx
+  movl $0666, %edx
+  int $LINUX_SYSCALL
+
+store_fd_in:
+  movl %eax, ST_FD_IN(%ebp)
+
+open_fd_out:
+  movl $SYS_OPEN, %eax
+  movl ST_ARGV_2(%ebp), %ebx
+  movl $O_CREAT_WRONLY_TRUNC, %ecx
+  movl $0666, %edx
+  int $LINUX_SYSCALL
+
+store_fd_out:
+  movl %eax, ST_FD_OUT(%ebp)
+
+read_loop_begin:
+  movl $SYS_READ, %eax
+  movl ST_FD_IN(%ebp), %ebx
+  movl ST_FD_IN(%ebp), %ebx
+  movl $BUFFER_DATA, %ecx
+  movl $BUFFER_SIZE, %edx
+  int $LINUX_SYSCALL
+
+  cmpl $END_OF_FILE, %eax
+  jle end_loop
+
+continue_read_loop:
+  pushl $BUFFER_DATA
+  pushl %eax
+  call convert_to_upper
+  popl %eax
+  addl $4, %esp
+movl %eax, %edx
+movl $SYS_WRITE, %eax
+movl ST_FD_OUT(%ebp), %ebx
+movl $BUFFER_DATA, %ecx
+int $LINUX_SYSCALL
+jmp read_loop_begin
+
+end_loop:
+  movl $SYS_CLOSE, %eax
+  movl ST_FD_OUT(%ebp), %ebx
+  int $LINUX_SYSCALL
+
+  movl $SYS_CLOSE, %eax
+  movl ST_FD_IN(%ebp), %ebx
+  int $LINUX_SYSCALL
+
+  movl $SYS_EXIT, %eax
+  movl $0, %ebx
+  int $LINUX_SYSCALL
+
+#Function
+.equ LOWERCASE_A, 'a'
+.equ LOWERCASE_Z, 'z'
+.equ UPPER_CONVERSION, 'A' - 'a'
+.equ ST_BUFFER_LEN, 8
+.equ ST_BUFFER, 12
+
+convert_to_upper:
+  pushl %ebp
+  movl %esp, %ebp
+  movl ST_BUFFER(%ebp), %eax
+  movl ST_BUFFER_LEN(%ebp), %ebx
+  movl $0, %edi
+
+  cmpl $0, %ebx
+  je end_convert_loop
+  
+convert_loop:
+  movb (%eax, %edi, 1), %cl
+  cmpb $LOWERCASE_A, %cl
+  jl next_byte
+
+  addb $UPPER_CONVERSION, %cl
+  movb %cl, (%eax, %edi, 1)
+next_byte:
+  incl %edi
+  cmpl %edi, %ebx
+  jne convert_loop
+
+end_convert_loop:
+  movl %ebp, %esp
+  popl %ebp
+  ret
+
