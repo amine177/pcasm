@@ -1,3 +1,6 @@
+# square function using my own calling convention
+# eax, ebx, ecx, edx as params
+# result in edi
 .section .data
 .section .text
 .globl _start
