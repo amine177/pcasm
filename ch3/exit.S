@@ -1,10 +1,12 @@
-# exit
+# a program illustrating exit() syscall
 
-.section .data
+.section .data    # the data section holds initialized static varaibles
 
-.section .text
-.globl _start
+.section .text    # the text section contains executable instructions
+.globl _start     # making _start visible to the linker (ld)
+                  # so _start will be added in the object code's export table
+
 _start:
-  movl $1, %eax #syscall 1, exit()
-  movl $2, %ebx #argument[0] = 0
-  int $0x80
+  movl $1, %eax    # 1 -> exit(int status)
+  movl $0, %ebx    # 0 -> status
+  int $0x80        # use interrupt vector 0x80 (software interrupt)
