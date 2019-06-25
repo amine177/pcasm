@@ -1,13 +1,8 @@
 .section .data
-
 .section .text
 .globl _start
 _start:
-  pushl $3
-  pushl $2
-  call power
-  addl $8, %esp
-  pushl $5
+  pushl $4
   pushl $2
   call power
   addl $8, %esp
@@ -15,27 +10,39 @@ _start:
   movl $1, %eax
   int $0x80
 
-.type power, @function
+.type  power, @function
 power:
   pushl %ebp
   movl %esp, %ebp
   subl $4, %esp
-
-  #args
-  movl 12(%ebp), %ecx
   movl 8(%ebp), %ebx
-
-  movl %ebx, -4(%ebp)
-  movl %ebx, %eax
-
-power_loop:
-  cmpl $1, %ecx
-  je end_power
+  movl 12(%ebp), %edx
+  movl $1, -4(%ebp)
+  
+power_iter_start:
+  cmpl $1, %edx
+  je end_iter
+  testb $1, %dl
+  jnz odd_mul
+  imull %ebx, %ebx
+  movl %edx, %eax
+  movl $2, %ecx
+  movl $0, %edx
+  divl  %ecx
+  movl %eax, %edx
+  jmp power_iter_start
+odd_mul:
+  movl -4(%ebp), %eax
   imull %ebx, %eax
-  decl %ecx
-  jmp power_loop
+  subl $1, %edx
+  movl %eax, -4(%ebp)
+  jmp power_iter_start
 
-end_power:
+
+end_iter:
+  movl -4(%ebp), %eax
+  imull %ebx, %eax
   movl %ebp, %esp
   popl %ebp
   ret
+
