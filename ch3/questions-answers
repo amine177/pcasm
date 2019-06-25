@@ -1,0 +1,48 @@
+• What does if mean if a line in the program starts with the ’#’ character?
+-> A comment
+• What is the difference between an assembly language file and an object code
+-> assembly language file is a text file, object code is binary code
+• What does the linker do?
+-> It substitutes labels and calls to libraries with addresses
+• How do you check the result status code of the last program you ran?
+-> echo $?
+• What is the difference between movl $1, %eax and movl 1, %eax?
+-> move the immediate value $1 into eax, move the value at address 1 into eax
+• Which register holds the system call number?
+-> eax
+• What are indexes used for?
+-> to access contiguous blocks of memory
+• Why do indexes usually start at 0?
+-> addr + 0 : first byte
+• If I issued the command movl data_items(,%edi,4), %eax and
+data_items was address 3634 and %edi held the value 13, what address would you be using to move into %eax?
+-> 3634 + 13 * 4 = 3686
+• List the general-purpose registers.
+-> eax, ebx, ecx, edx, edi, ebp, esi, esp
+• What is the difference between movl and movb?
+-> move 1 byte, move 4 bytes
+• What is flow control?
+-> changing eip
+• What does a conditional jump do?
+-> jumps when a condition is met according to the eflags registers
+• What things do you have to plan for when writing a program?
+-> calling conventions, data holders and flow control
+• Go through every instruction and list what addressing mode is being used for
+  movl $0, %edx                     ; immediate mode
+  movl data_items(,%edi,4), %eax    ; indexed mode
+  movl %eax, %ecx                   ; register mode
+
+_max_loop:
+  incl %edx                         ; register mode
+  movl data_items(,%edx,4), %ecx    ; indexed mode
+  cmpl $0, %ecx                     ; immediate mode
+  je _max_loop_end                  ; register mode
+  cmpl %eax, %ecx                   ; register mode
+  jle _max_loop                     ; direct mode
+  movl %ecx, %eax                   ; register mode
+  jmp _max_loop                     ; direct mode
+
+_max_loop_end:
+  movl %eax, %ebx                    ; register mode
+  movl $1, %eax                      ; immediate mode
+  int $0x80                          ; immediate mode
