@@ -1,0 +1,40 @@
+What are primitives?
+-> They are functions which are provided by the operating system
+
+What are calling conventions?
+-> It is the process by which we call a function:
+  - Pass it its arguments
+  - Recover the return value
+
+What is the stack?
+-> It is a data structure that grows by pushing data and shrinks
+by popping it
+-> In the context of a program's stack, it is a region of memory
+allocated reserved by a program by which it can push data on it,
+it grows down (the top of it gets a lower address as we add data)
+and shrinks up. The stack is mainly used to pass values between
+function calls thus the concept of a stack frame of every function.
+The top of the stack is always pointed to by %esp
+
+How do pushl and popl affect the stack? What special-purpose register
+do they affect?
+-> pushl pushed 32 bits of data on top of the stack
+-> popl pops 32 bits of data from the stack
+-> %esp is the affected register
+
+What are local variables and what are they used for?
+-> A local variable is a variable that its lifetime is exactly the 
+lifetime of a function's execution. They are usually only visible to
+the function that creates them in its own stack frame.
+-> A function needs to do calculations so it needs to allocate memory
+for local variables and then frees that memory
+
+What are %ebp and %esp used for?
+-> %ebp is used as a base pointer for the current stack frame
+we used as a fixed pointer and we offset from it positively
+to access arguments and negatively to access local variables.
+-> %esp is used to keep track on the top of the stack therfore
+we can push and pop  to it ..
+
+What is a stack frame?
+-> It is a region of memory that is indexed by the %ebp register
