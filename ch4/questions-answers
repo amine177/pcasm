@@ -43,3 +43,13 @@ Explain the problems that would arise without a standard calling convention
 -> Without a standard calling convention it will problematic to use other
 people's code. That would hinder the program composability and extensibility.
 Add to that the added cost of documentation and changing style ...
+
+Do you think it's better for a system to have a large set of primitives or 
+a small one, assuming that the larget set can be written in terms of the smallerone?
+-> Smaller is better and developers can build standard libraries on top of it
+
+Find an application, locate a specific feature and break it into functions.
+Define its interfaces with the other components.
+-> Bash, the feature is executing commands
+-> read(line); tokenize(line) ; parse(tokens); exec(command, arg1, .., argn)
+-> stdin-->bash(read, eval, print)->(command, arg1, ..., argn)-> stdout
