@@ -38,3 +38,8 @@ we can push and pop  to it ..
 
 What is a stack frame?
 -> It is a region of memory that is indexed by the %ebp register
+
+Explain the problems that would arise without a standard calling convention
+-> Without a standard calling convention it will problematic to use other
+people's code. That would hinder the program composability and extensibility.
+Add to that the added cost of documentation and changing style ...
