@@ -1,54 +1,55 @@
 .section .data
-ls1:
-  .long 3, 4, 5, 110
-ls2:
-  .long 120, -1, 200
-ls3:
-  .long 3, 3, -2
+l1:
+  .long 2, 3, 4, 5
+l2:
+  .long 4, 25, 10
+l3:
+  .long -1, 101
+
 
 .section .text
-  .globl _start
-_start:
+.globl _start
 
-  pushl $4
-  pushl $ls1
-  call max
-  addl $4, %esp
-  pushl $4
-  pushl $ls2
-  call max
-  addl $4, %esp
+_start:
   pushl $3
-  pushl $ls3
-  call max
-  addl $4, %esp
-  movl %eax, %ebx
+  pushl $l2
+  call max  # max(l1, l1.length)
+  add $4, %esp # free(max.local_variable)
+
+  movl %eax, %ebx # exit(%ebx)
   movl $1, %eax
   int $0x80
 
+
+
 .type max,@function
+
 max:
+  # prelogue
   pushl %ebp
   movl %esp, %ebp
-  movl $0, %edi
-  movl 8(%ebp), %ebx
-  movl 12(%ebp), %ecx
-  movl 0(%ebx, %edi, 4), %eax
-  cmpl $1, %ecx
-  jbe max_fin
 
-max_loop:
-  incl %edi
-  cmpl %edi, %ecx
-  je max_fin
-  movl 0(%ebx,%edi,4), %edx
-  cmpl %edx, %eax
-  jge max_loop
-  movl %edx, %eax
+  movl 0xC(%ebp), %ecx
+  movl 0x8(%ebp), %edx
+  decl %ecx
+  movl (%edx, %ecx, 4), %ebx
   jmp max_loop
 
+max_loop:
+  test %ecx, %ecx
+  jz max_end
+  
+  decl %ecx
+  movl (%edx, %ecx, 4), %eax
+  cmpl %eax, %ebx
+  jg max_loop
+  movl %eax, %ebx
+  jmp max_loop
 
-max_fin:
+max_end:
+  movl %ebx, %eax
+
+  # epilogue
   movl %ebp, %esp
   popl %ebp
   ret
