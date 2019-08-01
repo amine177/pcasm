@@ -1,52 +1,117 @@
 .section .data
-  .equ SYS_READ, 0x3
-  .equ SYS_WRITE, 0x4
-  .equ SYS_OPEN, 0x5
-  .equ SYS_CLOSE, 0x6
-  .equ SYS_EXIT, 0x1
-  .equ O_RDONLY, 0x0
-  .equ O_CREAT_WRONLY_TRUN, 03101
-  .equ EOF, 0
-  .equ STDIN, 0x0
-  .equ STDOUT, 0x1
-  .equ STDERR, 0x2
-  .equ LINUX_SYSCALL, 0x80
+# we define constants here
+
+.equ SYS_OPEN, 5
+.equ SYS_WRITE, 4
+.equ SYS_READ, 3
+.equ SYS_CLOSE, 6
+.equ SYS_EXIT, 1
+
+# O_CREAT | O_WRONLY | O_TRUNC = 03101
+.equ O_CREAT_WRONLY_TRUNC, 03101
+
+# O_RDONLY
+.equ O_RDONLY, 0
+
+# descriptors
+.equ STDIN, 0
+.equ STDOUT, 1
+.equ STDERR, 2
+
+# syscall interrupt
+.equ LINUX_SYSCALL, 0x80
+.equ EOF, 0
+.equ ARGC, 2
+
+# uninitialized data
 .section .bss
-  .equ BUFFER_SIZE, 500
-  .lcomm BUFFER_DATA, BUFFER_SIZE
+
+.equ MAXSIZE, 1024
+.lcomm BUFF, MAXSIZE
 
 .section .text
-  .equ ST_SIZE_RESERVE, 8
-  .equ ST_FD_IN, -4
-  .equ ST_FD_OUT, -8
-  .equ ST_ARGC, 0
-  .equ ST_ARGV_0, 4
-  .equ ST_ARGV_1, 8
-  .equ ST_ARGV_2, 12
-
-.globl _start:
+.globl _start
 _start:
-  movl %esp, %ebp
-  subl $ST_SIZE_RESERVE, %esp
-open_files:
-open_fd_in:
+  movl %esp, %ebp # using ebp as frame base
+  subl $0x8, %esp # allocate tow words for the tow fds
+  # open source file
   movl $SYS_OPEN, %eax
-  movl ST_ARGV_1(%ebp), %ebx
+  movl 0x8(%ebp), %ebx
   movl $O_RDONLY, %ecx
   movl $0666, %edx
-
+  int $LINUX_SYSCALL
+  movl %eax, -0x4(%ebp)
+  
+  # open or creat destination file
+  movl $SYS_OPEN, %eax
+  movl 0xC(%ebp), %ebx
+  movl $O_CREAT_WRONLY_TRUNC, %ecx
+  movl $0666, %edx # rights for creat if not exist
+  int $LINUX_SYSCALL
+  movl %eax, -0x8(%ebp)
+read_loop:
+  movl $SYS_READ, %eax
+  movl -0x4(%ebp), %ebx
+  movl $BUFF, %ecx
+  movl $MAXSIZE, %edx
+  int $LINUX_SYSCALL
+  
+  cmpl $EOF, %eax
+  jle read_end
+  
+  pushl %eax
+  pushl $BUFF
+  call upper
+  popl %edx
+  popl %edx
+  
+  movl  $SYS_WRITE, %eax
+  movl -0x8(%ebp), %ebx
+  movl $BUFF, %ecx
   int $LINUX_SYSCALL
 
-stor_fd_out:
-  movl %eax, ST_FD_OUT(%ebp)
+  jmp read_loop
 
-read_loop_begin:
+read_end:
+  movl $SYS_CLOSE, %eax
+  movl 0x4(%ebp), %ebx
+  int $LINUX_SYSCALL
+  movl $SYS_CLOSE, %eax
+  movl 0x8(%ebp), %ebx
+  int $LINUX_SYSCALL
 
-.type readbytes, @fuction
-readbytes:
+  movl $1, %eax
+  movl $0, %ebx
+  int $LINUX_SYSCALL
+
+
+# upper(buff, buff.length)
+.equ LOWER_A, 'a'
+.equ LOWER_Z, 'z'
+.equ UPPER_LOWER_OFFSET, 'A' - 'a'
+.type upper,@function
+upper:
   pushl %ebp
   movl %esp, %ebp
-  movl 8(%ebp), %ecx
-  movl 12(%ebp), %edx
-  movl SYS_RED, %eax
-  int $LINUX_SYSCALL
+
+  movl 0xc(%ebp), %ecx
+  movl 0x8(%ebp), %eax
+
+upper_loop:
+  decl %ecx
+  test %ecx, %ecx
+  jz upper_end
+  xor %edx, %edx
+  movb (%eax,%ecx,1), %dl
+  cmpb $LOWER_A, %dl
+  jl upper_loop
+  cmpb $LOWER_Z, %dl
+  jg upper_loop
+  addb $UPPER_LOWER_OFFSET, %dl
+  movb %dl, (%eax, %ecx, 1)
+  jmp upper_loop
+
+upper_end:
+  movl %ebp, %esp
+  popl %ebp
+  ret
