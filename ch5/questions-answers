@@ -1,0 +1,36 @@
+- Describe the lifecycle of a file descriptor.
+-> Get an FD using open, use the FD to access a file, close the file using
+the FD
+
+- What are the standard file descriptors and what are they used for?
+-> STDIN (standard input, 0) : get input from attached input facility
+-> STDOUT (standard output, 1) : send output to attached output facility
+-> STDERR (standard error, 2) : send error messages to attached error output
+facility
+
+- What is a buffer?
+-> It is a region of memory that would hold sequential data 
+-> BUF is [BUFF_ADDR, BUFF_ADDR+1, ..., BUFF_ADDR+BUFF_SIZE-1]
+
+- What is the difference between the .data section and the .bss section?
+-> The .data section holds initialized data, while .bss holds non initialized
+data (usually allocated by the programmer).
+
+- What are the system calls related to reading and writing files?
+-> open(char * pathname,  int flags, mode_t mode) : open file by pathname
+-> read(int fd, void *buf, size_t count) : read from file count values into buf
+-> write(int fd, void *buf, size_t count) : write to file count values from buf
+-> creat(char *pathname, int flags, mode_t mode) : create file by pathname
+
+
+Going further:
+
+- What difference does the size of the buffer make?
+-> More memory will bereserved, in relations to reading from files that means
+less read cycles which may improve speed
+
+- What error results can be returned by each of these system calls?
+-> return -1 on fail and set errno to various error codes
+-> open : EACCES (not permitted to access
+          EOVERFLOW (file too large)
+   read : return -1 on fail, errno is set to EBADF (bad file descriptor)
