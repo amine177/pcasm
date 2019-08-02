@@ -1,2 +1,5 @@
 Working through 'Programming from the ground up'
 https://savannah.nongnu.org/projects/pgubook/
+
+assemble using : as --32 filename.S -o filename.o
+link using : ld -melf_i386 filename.o -o filename
