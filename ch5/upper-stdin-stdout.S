@@ -2,27 +2,14 @@
 .section .data
 # we define constants here
 
-.equ SYS_OPEN, 5
 .equ SYS_WRITE, 4
 .equ SYS_READ, 3
-.equ SYS_CLOSE, 6
 .equ SYS_EXIT, 1
 
-# O_CREAT | O_WRONLY | O_TRUNC = 03101
-.equ O_CREAT_WRONLY_TRUNC, 03101
-
-# O_RDONLY
-.equ O_RDONLY, 0
-
-# descriptors
-.equ STDIN, 0
-.equ STDOUT, 1
-.equ STDERR, 2
 
 # syscall interrupt
 .equ LINUX_SYSCALL, 0x80
 .equ EOF, 0
-.equ ARGC, 2
 
 # uninitialized data
 .section .bss
