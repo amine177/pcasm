@@ -99,8 +99,8 @@ upper:
 
 upper_loop:
   decl %ecx
-  test %ecx, %ecx
-  jz upper_end
+  cmpl $-0x1, %ecx
+  je upper_end
   xor %edx, %edx
   movb (%eax,%ecx,1), %dl
   cmpb $LOWER_A, %dl
