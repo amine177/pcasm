@@ -1,5 +1,5 @@
-.include "record-def.s"
-.include "linux.s"
+.include "record-def.S"
+.include "linux.S"
 
 
 
