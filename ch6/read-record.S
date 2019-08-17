@@ -14,7 +14,7 @@
 
 .section .text
 .globl read_record
-type read_record, @function
+.type read_record, @function
 
 read_record:
   pushl %ebp
