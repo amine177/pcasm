@@ -7,7 +7,7 @@
 
 r1:
   .ascii "Neo\0"
-  .rept 31
+  .rept 36
   .byte 0
   .endr
 
@@ -25,7 +25,7 @@ r1:
 
 r2:
   .ascii "Kafka\0"
-  .rept 29
+  .rept 34
   .byte 0
   .endr
 
@@ -44,7 +44,7 @@ r2:
 
 r3:
   .ascii "Chaka\0"
-  .rept 29
+  .rept 34
   .byte 0
   .endr
 
