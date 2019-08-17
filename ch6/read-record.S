@@ -22,7 +22,7 @@ read_record:
   
   movl FD(%ebp), %ebx
   movl BUFF(%ebp), %ecx
-  movl $RECORD_SIZE, %edx
+  movl $324, %edx
   movl $SYS_READ, %eax
   int $0x80
 

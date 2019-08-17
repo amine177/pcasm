@@ -28,6 +28,8 @@ _start:
   pushl $BUF
   pushl %eax
   call read_record
+  cmpl $RECORD_SIZE, %eax
+  jne end_prog
   addl $0x8, %esp
   pushl $BUF
   call print_record
@@ -40,7 +42,7 @@ _start:
   call print_record
   
 
-  
+end_prog:  
   movl $0x0, %ebx
   movl $SYS_EXIT, %eax
   int $0x80
